@@ -1,0 +1,10 @@
+<!-- templates/formulario.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Formulario de Datos</h2>
+<form action="{{ url_for('guardar_txt') }}" method="POST">
+    <label>Contenido para TXT:</label><br>
+    <textarea name="data" rows="4" cols="40"></textarea><br>
+    <button type="submit">Guardar</button>
+</form>
+{% endblock %}

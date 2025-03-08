@@ -1,0 +1,13 @@
+<!-- templates/resultado.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Resultado</h2>
+
+<!-- Imprimimos "contenido" que nos manda la ruta -->
+{% if contenido %}
+    <pre>{{ contenido|safe }}</pre>
+{% else %}
+    <p>No hay contenido para mostrar.</p>
+{% endif %}
+
+{% endblock %}

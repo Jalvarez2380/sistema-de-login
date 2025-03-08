@@ -1,0 +1,47 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+{% block content %}
+
+<h2>Inicio</h2>
+<p>Bienvenido a la aplicación de Persistencia de Datos.</p>
+
+<!-- Formulario para guardar en TXT -->
+<form action="{{ url_for('guardar_txt') }}" method="POST">
+    <label>Contenido TXT:</label><br>
+    <textarea name="data" rows="3" cols="30"></textarea><br>
+    <button type="submit">Guardar en TXT</button>
+</form>
+<hr>
+
+<!-- Formulario para guardar en JSON -->
+<form action="{{ url_for('guardar_json') }}" method="POST">
+    <label>Contenido JSON:</label><br>
+    <textarea name="data" rows="3" cols="30"></textarea><br>
+    <button type="submit">Guardar en JSON</button>
+</form>
+<hr>
+
+<!-- Formulario para guardar en CSV -->
+<form action="{{ url_for('guardar_csv') }}" method="POST">
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required>
+    <label>Edad:</label>
+    <input type="number" name="edad" required>
+    <label>Ciudad:</label>
+    <input type="text" name="ciudad" required>
+    <button type="submit">Guardar en CSV</button>
+</form>
+<hr>
+
+<!-- Formulario para agregar usuario en SQLite -->
+<form action="{{ url_for('agregar_usuario') }}" method="POST">
+    <label>Nombre:</label>
+    <input type="text" name="nombre" required>
+    <label>Edad:</label>
+    <input type="number" name="edad" required>
+    <label>Ciudad:</label>
+    <input type="text" name="ciudad" required>
+    <button type="submit">Agregar Usuario (SQLite)</button>
+</form>
+
+{% endblock %}

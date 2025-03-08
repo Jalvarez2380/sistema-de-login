@@ -1,0 +1,27 @@
+<!-- templates/usuarios.html -->
+{% extends 'base.html' %}
+{% block content %}
+<h2>Lista de Usuarios (SQLite)</h2>
+
+{% if usuarios %}
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Edad</th>
+            <th>Ciudad</th>
+        </tr>
+        {% for user in usuarios %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.nombre }}</td>
+            <td>{{ user.edad }}</td>
+            <td>{{ user.ciudad }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No hay usuarios registrados.</p>
+{% endif %}
+
+{% endblock %}

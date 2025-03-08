@@ -1,0 +1,31 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Proyecto Flask</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Mi Proyecto Flask</h1>
+        <nav>
+            <a href="{{ url_for('index') }}">Inicio</a> |
+            <a href="{{ url_for('leer_txt') }}">Leer TXT</a> |
+            <a href="{{ url_for('leer_json') }}">Leer JSON</a> |
+            <a href="{{ url_for('leer_csv') }}">Leer CSV</a> |
+            <a href="{{ url_for('listar_usuarios') }}">Listar Usuarios (SQLite)</a>
+        </nav>
+    </header>
+    <hr>
+
+    <section>
+        {% block content %}{% endblock %}
+    </section>
+
+    <footer>
+        <hr>
+        <p>Desarrollo Web - Persistencia de Datos</p>
+    </footer>
+</body>
+</html>
