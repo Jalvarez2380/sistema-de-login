@@ -5,6 +5,17 @@
 <h2>Inicio</h2>
 <p>Bienvenido a la aplicación de Persistencia de Datos.</p>
 
+<!-- Navegación -->
+<p>
+  <a href="{{ url_for('leer_txt') }}">Leer TXT</a> |
+  <a href="{{ url_for('leer_json') }}">Leer JSON</a> |
+  <a href="{{ url_for('leer_csv') }}">Leer CSV</a> |
+  <a href="{{ url_for('listar_usuarios') }}">Listar Usuarios (MySQL)</a> |
+  <a href="{{ url_for('login') }}">Login</a> |
+  <a href="{{ url_for('registro') }}">Registro</a>
+</p>
+<hr>
+
 <!-- Formulario para guardar en TXT -->
 <form action="{{ url_for('guardar_txt') }}" method="POST">
     <label>Contenido TXT:</label><br>
@@ -33,15 +44,13 @@
 </form>
 <hr>
 
-<!-- Formulario para agregar usuario en SQLite -->
+<!-- Formulario para agregar usuario en MySQL -->
 <form action="{{ url_for('agregar_usuario') }}" method="POST">
     <label>Nombre:</label>
     <input type="text" name="nombre" required>
-    <label>Edad:</label>
-    <input type="number" name="edad" required>
-    <label>Ciudad:</label>
-    <input type="text" name="ciudad" required>
-    <button type="submit">Agregar Usuario (SQLite)</button>
+    <label>Correo:</label>
+    <input type="email" name="mail" required>
+    <button type="submit">Agregar Usuario (MySQL)</button>
 </form>
 
 {% endblock %}
