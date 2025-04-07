@@ -7,7 +7,6 @@ from models import Usuario
 app = Flask(__name__)
 app.secret_key = 'secreto_seguro'
 
-# Configuración de login
 login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
@@ -24,18 +23,18 @@ def load_user(user_id):
             return Usuario(usuario['id_usuario'], usuario['nombre'], usuario['mail'], usuario['password'])
     return None
 
-# RUTA PRINCIPAL
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('ruta_protegida'))
+    return redirect(url_for('login'))
 
-# 1) TXT
 @app.route('/guardar_txt', methods=['POST'])
 def guardar_txt():
     data = request.form.get('data')
     with open(os.path.join('datos', 'datos.txt'), 'w') as file:
         file.write(data)
-    return redirect(url_for('index'))
+    return redirect(url_for('ruta_protegida'))
 
 @app.route('/leer_txt')
 def leer_txt():
@@ -43,13 +42,12 @@ def leer_txt():
         contenido = file.read()
     return render_template('resultado.html', contenido=contenido)
 
-# 2) JSON
 @app.route('/guardar_json', methods=['POST'])
 def guardar_json():
     data = {"data": request.form.get('data')}
     with open(os.path.join('datos', 'datos.json'), 'w') as file:
         json.dump(data, file, indent=4)
-    return redirect(url_for('index'))
+    return redirect(url_for('ruta_protegida'))
 
 @app.route('/leer_json')
 def leer_json():
@@ -57,7 +55,6 @@ def leer_json():
         data = json.load(file)
     return render_template('resultado.html', contenido=data)
 
-# 3) CSV
 @app.route('/guardar_csv', methods=['POST'])
 def guardar_csv():
     nombre = request.form.get('nombre')
@@ -65,7 +62,7 @@ def guardar_csv():
     ciudad = request.form.get('ciudad')
     with open(os.path.join('datos', 'datos.csv'), 'a', newline='') as file:
         csv.writer(file).writerow([nombre, edad, ciudad])
-    return redirect(url_for('index'))
+    return redirect(url_for('ruta_protegida'))
 
 @app.route('/leer_csv')
 def leer_csv():
@@ -75,7 +72,6 @@ def leer_csv():
             rows.append(row)
     return render_template('resultado.html', contenido=rows)
 
-# 4) MySQL (Usuarios CRUD + Login)
 @app.route('/agregar_usuario', methods=['POST'])
 def agregar_usuario():
     nombre = request.form.get('nombre')
@@ -90,26 +86,83 @@ def agregar_usuario():
     return redirect(url_for('listar_usuarios'))
 
 @app.route('/listar_usuarios')
+@login_required
 def listar_usuarios():
     conexion = obtener_conexion()
     if conexion:
         cursor = conexion.cursor(dictionary=True)
-        cursor.execute("SELECT id_usuario, nombre, edad, ciudad FROM usuarios")
+        cursor.execute("SELECT id_usuario, nombre, edad, ciudad, mail FROM usuarios")
         usuarios = cursor.fetchall()
         conexion.close()
         return render_template("usuarios.html", usuarios=usuarios)
     return "Error al conectar con MySQL"
 
 @app.route('/usuarios_json')
+@login_required
 def usuarios_json():
     conexion = obtener_conexion()
     if conexion:
         cursor = conexion.cursor(dictionary=True)
-        cursor.execute("SELECT id_usuario, nombre, edad, ciudad FROM usuarios")
+        cursor.execute("SELECT id_usuario, nombre, edad, ciudad, mail FROM usuarios")
         usuarios = cursor.fetchall()
         conexion.close()
         return jsonify(usuarios)
     return jsonify({"error": "No se pudo conectar"}), 500
+
+@app.route('/productos')
+@login_required
+def listar_productos():
+    conexion = obtener_conexion()
+    if conexion:
+        cursor = conexion.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM productos")
+        productos = cursor.fetchall()
+        conexion.close()
+        return render_template("listar.html", productos=productos)
+    return "Error al cargar productos"
+
+@app.route('/crear', methods=['GET', 'POST'])
+@login_required
+def crear_producto():
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        precio = request.form['precio']
+        stock = request.form['stock']
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+        cursor.execute("INSERT INTO productos (nombre, precio, stock) VALUES (%s, %s, %s)", (nombre, precio, stock))
+        conexion.commit()
+        conexion.close()
+        return redirect(url_for('listar_productos'))
+    return render_template('crear.html')
+
+@app.route('/editar/<int:id>', methods=['GET', 'POST'])
+@login_required
+def editar_producto(id):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    if request.method == 'POST':
+        nombre = request.form['nombre']
+        precio = request.form['precio']
+        stock = request.form['stock']
+        cursor.execute("UPDATE productos SET nombre=%s, precio=%s, stock=%s WHERE id_producto=%s", (nombre, precio, stock, id))
+        conexion.commit()
+        conexion.close()
+        return redirect(url_for('listar_productos'))
+    cursor.execute("SELECT * FROM productos WHERE id_producto = %s", (id,))
+    producto = cursor.fetchone()
+    conexion.close()
+    return render_template('editar.html', producto=producto)
+
+@app.route('/eliminar/<int:id>')
+@login_required
+def eliminar_producto(id):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM productos WHERE id_producto = %s", (id,))
+    conexion.commit()
+    conexion.close()
+    return redirect(url_for('listar_productos'))
 
 @app.route('/test_db')
 def test_db():
@@ -122,9 +175,9 @@ def test_db():
     except Exception as e:
         return f"❌ Error: {e}", 500
 
-# LOGIN
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    mensaje = None
     if request.method == 'POST':
         mail = request.form['mail']
         password = request.form['password']
@@ -138,34 +191,42 @@ def login():
                 user = Usuario(usuario['id_usuario'], usuario['nombre'], usuario['mail'], usuario['password'])
                 login_user(user)
                 return redirect(url_for('ruta_protegida'))
-        return "Credenciales inválidas"
-    return render_template('login.html')
+            else:
+                mensaje = "Credenciales inválidas"
+    return render_template('login.html', mensaje=mensaje)
 
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 @app.route('/registro', methods=['GET', 'POST'])
 def registro():
+    mensaje = None
     if request.method == 'POST':
         nombre = request.form['nombre']
         mail = request.form['mail']
         password = request.form['password']
+        ciudad = request.form['ciudad'] or 'No especificado'
         conexion = obtener_conexion()
         if conexion:
             cursor = conexion.cursor()
-            cursor.execute("INSERT INTO usuarios (nombre, mail, password) VALUES (%s, %s, %s)", (nombre, mail, password))
-            conexion.commit()
-            conexion.close()
-        return redirect(url_for('login'))
-    return render_template('registro.html')
+            cursor.execute("SELECT * FROM usuarios WHERE mail = %s", (mail,))
+            if cursor.fetchone():
+                mensaje = "El correo ya está registrado."
+            else:
+                cursor.execute("INSERT INTO usuarios (nombre, mail, password, ciudad) VALUES (%s, %s, %s, %s)", (nombre, mail, password, ciudad))
+                conexion.commit()
+                conexion.close()
+                return redirect(url_for('login'))
+    return render_template('registro.html', mensaje=mensaje)
 
 @app.route('/ruta_protegida')
 @login_required
 def ruta_protegida():
-    return f"Hola, {current_user.nombre}. Esta es una ruta protegida."
+    return render_template('index.html', nombre=current_user.nombre)
 
 if __name__ == '__main__':
     app.run(debug=True)
+

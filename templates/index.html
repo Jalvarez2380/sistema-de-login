@@ -2,55 +2,56 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h2>Inicio</h2>
-<p>Bienvenido a la aplicación de Persistencia de Datos.</p>
+<h2 class="mb-4">Inicio</h2>
+<p class="lead">Bienvenido a la aplicación de Persistencia de Datos con Flask.</p>
 
-<!-- Navegación -->
-<p>
-  <a href="{{ url_for('leer_txt') }}">Leer TXT</a> |
-  <a href="{{ url_for('leer_json') }}">Leer JSON</a> |
-  <a href="{{ url_for('leer_csv') }}">Leer CSV</a> |
-  <a href="{{ url_for('listar_usuarios') }}">Listar Usuarios (MySQL)</a> |
-  <a href="{{ url_for('login') }}">Login</a> |
-  <a href="{{ url_for('registro') }}">Registro</a>
-</p>
-<hr>
+<!-- TXT -->
+<div class="card mb-3">
+  <div class="card-header">Archivo TXT</div>
+  <div class="card-body">
+    <form action="{{ url_for('guardar_txt') }}" method="POST">
+      <textarea name="data" rows="3" class="form-control mb-2" placeholder="Escribe algo para guardar en TXT..."></textarea>
+      <button type="submit" class="btn btn-primary">Guardar en TXT</button>
+    </form>
+  </div>
+</div>
 
-<!-- Formulario para guardar en TXT -->
-<form action="{{ url_for('guardar_txt') }}" method="POST">
-    <label>Contenido TXT:</label><br>
-    <textarea name="data" rows="3" cols="30"></textarea><br>
-    <button type="submit">Guardar en TXT</button>
-</form>
-<hr>
+<!-- JSON -->
+<div class="card mb-3">
+  <div class="card-header">Archivo JSON</div>
+  <div class="card-body">
+    <form action="{{ url_for('guardar_json') }}" method="POST">
+      <textarea name="data" rows="3" class="form-control mb-2" placeholder="Escribe algo para guardar en JSON..."></textarea>
+      <button type="submit" class="btn btn-primary">Guardar en JSON</button>
+    </form>
+  </div>
+</div>
 
-<!-- Formulario para guardar en JSON -->
-<form action="{{ url_for('guardar_json') }}" method="POST">
-    <label>Contenido JSON:</label><br>
-    <textarea name="data" rows="3" cols="30"></textarea><br>
-    <button type="submit">Guardar en JSON</button>
-</form>
-<hr>
+<!-- CSV -->
+<div class="card mb-3">
+  <div class="card-header">Guardar Datos en CSV</div>
+  <div class="card-body">
+    <form action="{{ url_for('guardar_csv') }}" method="POST" class="row g-2">
+      <div class="col-md-4"><input name="nombre" class="form-control" placeholder="Nombre" required></div>
+      <div class="col-md-2"><input name="edad" type="number" class="form-control" placeholder="Edad" required></div>
+      <div class="col-md-4"><input name="ciudad" class="form-control" placeholder="Ciudad" required></div>
+      <div class="col-md-2"><button class="btn btn-success w-100">Guardar en CSV</button></div>
+    </form>
+  </div>
+</div>
 
-<!-- Formulario para guardar en CSV -->
-<form action="{{ url_for('guardar_csv') }}" method="POST">
-    <label>Nombre:</label>
-    <input type="text" name="nombre" required>
-    <label>Edad:</label>
-    <input type="number" name="edad" required>
-    <label>Ciudad:</label>
-    <input type="text" name="ciudad" required>
-    <button type="submit">Guardar en CSV</button>
-</form>
-<hr>
-
-<!-- Formulario para agregar usuario en MySQL -->
-<form action="{{ url_for('agregar_usuario') }}" method="POST">
-    <label>Nombre:</label>
-    <input type="text" name="nombre" required>
-    <label>Correo:</label>
-    <input type="email" name="mail" required>
-    <button type="submit">Agregar Usuario (MySQL)</button>
-</form>
+<!-- MySQL -->
+<div class="card mb-3">
+  <div class="card-header">Agregar Usuario (MySQL)</div>
+  <div class="card-body">
+    <form action="{{ url_for('agregar_usuario') }}" method="POST" class="row g-2">
+      <div class="col-md-3"><input name="nombre" class="form-control" placeholder="Nombre" required></div>
+      <div class="col-md-3"><input name="edad" type="number" class="form-control" placeholder="Edad" required></div>
+      <div class="col-md-4"><input name="ciudad" class="form-control" placeholder="Ciudad" required></div>
+      <div class="col-md-2"><button class="btn btn-success w-100">Agregar Usuario</button></div>
+    </form>
+  </div>
+</div>
 
 {% endblock %}
+

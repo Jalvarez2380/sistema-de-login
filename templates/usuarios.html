@@ -1,20 +1,31 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-<h2>Lista de Usuarios</h2>
-<table border="1">
-    <tr>
+
+<div class="container">
+  <h2 class="mb-4">Lista de Usuarios</h2>
+
+  <table class="table table-bordered table-hover table-striped">
+    <thead class="table-dark">
+      <tr>
         <th>ID</th>
         <th>Nombre</th>
         <th>Edad</th>
         <th>Ciudad</th>
-    </tr>
-    {% for usuario in usuarios %}
-    <tr>
+        <th>Correo</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usuario in usuarios %}
+      <tr>
         <td>{{ usuario.id_usuario }}</td>
         <td>{{ usuario.nombre }}</td>
         <td>{{ usuario.edad }}</td>
         <td>{{ usuario.ciudad }}</td>
-    </tr>
-    {% endfor %}
-</table>
+        <td>{{ usuario.mail }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
 {% endblock %}

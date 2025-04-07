@@ -1,18 +1,38 @@
-# templates/login.html
+<!-- templates/login.html -->
 {% extends 'base.html' %}
 {% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h2 class="mb-4">Iniciar Sesión</h2>
 
-<h2>Login</h2>
-<form method="POST">
-    <label>Email:</label>
-    <input type="email" name="mail" required><br>
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
 
-    <label>Contraseña:</label>
-    <input type="password" name="password" required><br>
+    <form method="POST">
+      <div class="mb-3">
+        <label for="mail" class="form-label">Correo</label>
+        <input type="email" class="form-control" name="mail" id="mail" required>
+      </div>
 
-    <button type="submit">Iniciar Sesión</button>
-</form>
+      <div class="mb-3">
+        <label for="password" class="form-label">Clave</label>
+        <div class="input-group">
+          <input type="password" class="form-control" name="password" id="password" required>
+          <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()">👁️</button>
+        </div>
+      </div>
 
-<p>¿No tienes cuenta? <a href="{{ url_for('registro') }}">Regístrate aquí</a></p>
+      <button type="submit" class="btn btn-primary">Ingresar</button>
+      <a href="{{ url_for('registro') }}" class="btn btn-link">Registrarse</a>
+    </form>
+  </div>
+</div>
 
+<script>
+function togglePassword() {
+  const input = document.getElementById("password");
+  input.type = input.type === "password" ? "text" : "password";
+}
+</script>
 {% endblock %}
